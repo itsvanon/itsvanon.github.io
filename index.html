@@ -80,19 +80,88 @@
             color: #ff69b4;
             margin: 20px 0;
         }
+
+        .falling-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart-particle {
+            position: fixed;
+            pointer-events: none;
+            animation: falling linear forwards;
+        }
+
+        @keyframes falling {
+            0% {
+                transform: translateY(-10%) rotate(0deg);
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .typing-effect {
+            overflow: hidden;
+            border-right: .15em solid #ff69b4;
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #ff69b4 }
+        }
+
+        .hover-effect {
+            transition: all 0.3s ease;
+        }
+
+        .hover-effect:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+
+        .love-meter {
+            width: 100%;
+            height: 20px;
+            background-color: #ffe6e6;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .love-meter-fill {
+            width: 0%;
+            height: 100%;
+            background-color: #ff69b4;
+            transition: width 3s ease-in-out;
+        }
     </style>
 </head>
 <body>
+    <div class="falling-hearts"></div>
     <div class="container">
         <div class="name-section active">
-            <h1>❤️ Hi there! ❤️</h1>
+            <h1 class="typing-effect">❤️ Hi there! ❤️</h1>
             <p>Before we begin, what's your name?</p>
             <input type="text" id="nameInput" placeholder="Enter your name">
-            <button onclick="showValentine()">Continue</button>
+            <button onclick="showValentine()" class="hover-effect">Continue</button>
         </div>
 
         <div class="valentine-section">
-            <div class="cat-ascii">
+            <div class="cat-ascii hover-effect">
   /\___/\
  (  o o  )
  (  =^=  ) 
@@ -100,19 +169,22 @@
 </div>
             <h1>Dear <span id="displayName"></span></h1>
             <p class="heart">♥</p>
-            <h2>Will you be my Valentine?</h2>
-            <button onclick="acceptValentine()" style="background-color: #4CAF50;">Yes!</button>
+            <h2 class="typing-effect">Will you be my Valentine?</h2>
+            <div class="love-meter">
+                <div class="love-meter-fill"></div>
+            </div>
+            <button onclick="acceptValentine()" class="hover-effect" style="background-color: #4CAF50;">Yes!</button>
             <button class="no-btn" onmouseover="moveButton(this)">No</button>
         </div>
 
         <div class="success-section">
-            <div class="cat-ascii">
+            <div class="cat-ascii hover-effect">
   /\___/\
  ( ^w^ )
  (  >♥<  ) 
   (---)
 </div>
-            <h1>Yay! ♥‿♥</h1>
+            <h1 class="typing-effect">Yay! ♥‿♥</h1>
             <p>Thank you for making me the happiest person!</p>
             <div class="heart">♥</div>
         </div>
@@ -157,6 +229,63 @@
             audio.loop = true;
             audio.play().catch(e => console.log('Audio autoplay was prevented'));
         }, { once: true });
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle';
+            heart.innerHTML = '♥';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+            heart.style.color = `hsl(${Math.random() * 60 + 330}, 100%, 70%)`;
+            document.querySelector('.falling-hearts').appendChild(heart);
+            
+            heart.addEventListener('animationend', () => heart.remove());
+        }
+
+        setInterval(createHeart, 300);
+
+        function showValentine() {
+            const name = document.getElementById('nameInput').value;
+            if (name.trim() === '') {
+                alert('Please enter your name ♥');
+                return;
+            }
+            document.getElementById('displayName').textContent = name;
+            document.querySelector('.name-section').classList.remove('active');
+            document.querySelector('.valentine-section').classList.add('active');
+            
+            // Start love meter animation
+            setTimeout(() => {
+                document.querySelector('.love-meter-fill').style.width = '100%';
+            }, 500);
+        }
+
+        let noButtonClicks = 0;
+        function moveButton(btn) {
+            noButtonClicks++;
+            const container = document.querySelector('.container');
+            const rect = container.getBoundingClientRect();
+            const btnRect = btn.getBoundingClientRect();
+            
+            const maxX = rect.width - btnRect.width;
+            const maxY = rect.height - btnRect.height;
+            
+            let randomX = Math.random() * maxX;
+            let randomY = Math.random() * maxY;
+            
+            btn.style.position = 'absolute';
+            btn.style.left = `${randomX}px`;
+            btn.style.top = `${randomY}px`;
+            
+            // Make it harder to click after each attempt
+            btn.style.transition = 'all 0.3s ease';
+            btn.style.transform = `scale(${Math.max(0.5, 1 - noButtonClicks * 0.1)})`;
+            
+            if (noButtonClicks > 5) {
+                btn.style.opacity = `${Math.max(0.3, 1 - (noButtonClicks - 5) * 0.1)}`;
+            }
+        }
     </script>
 </body>
 </html>
