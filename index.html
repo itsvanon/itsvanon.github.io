@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Be My Valentine?</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', cursive;
+            background-color: #ffe6f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(255, 182, 193, 0.5);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .name-section, .valentine-section, .success-section {
+            display: none;
+        }
+
+        .name-section.active, .valentine-section.active, .success-section.active {
+            display: block;
+        }
+
+        input {
+            padding: 10px;
+            border: 2px solid pink;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 10px;
+            transition: transform 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+        }
+
+        .no-btn {
+            position: absolute;
+            background-color: #ff4d6d;
+        }
+
+        .heart {
+            color: #ff69b4;
+            font-size: 2em;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .cat-ascii {
+            white-space: pre;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ff69b4;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="name-section active">
+            <h1>❤️ Hi there! ❤️</h1>
+            <p>Before we begin, what's your name?</p>
+            <input type="text" id="nameInput" placeholder="Enter your name">
+            <button onclick="showValentine()">Continue</button>
+        </div>
+
+        <div class="valentine-section">
+            <div class="cat-ascii">
+  /\___/\
+ (  o o  )
+ (  =^=  ) 
+  (---)
+</div>
+            <h1>Dear <span id="displayName"></span></h1>
+            <p class="heart">♥</p>
+            <h2>Will you be my Valentine?</h2>
+            <button onclick="acceptValentine()" style="background-color: #4CAF50;">Yes!</button>
+            <button class="no-btn" onmouseover="moveButton(this)">No</button>
+        </div>
+
+        <div class="success-section">
+            <div class="cat-ascii">
+  /\___/\
+ ( ^w^ )
+ (  >♥<  ) 
+  (---)
+</div>
+            <h1>Yay! ♥‿♥</h1>
+            <p>Thank you for making me the happiest person!</p>
+            <div class="heart">♥</div>
+        </div>
+    </div>
+
+    <script>
+        function showValentine() {
+            const name = document.getElementById('nameInput').value;
+            if (name.trim() === '') {
+                alert('Please enter your name ♥');
+                return;
+            }
+            document.getElementById('displayName').textContent = name;
+            document.querySelector('.name-section').classList.remove('active');
+            document.querySelector('.valentine-section').classList.add('active');
+        }
+
+        function moveButton(btn) {
+            const container = document.querySelector('.container');
+            const rect = container.getBoundingClientRect();
+            const btnRect = btn.getBoundingClientRect();
+            
+            const maxX = rect.width - btnRect.width;
+            const maxY = rect.height - btnRect.height;
+            
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+            
+            btn.style.position = 'absolute';
+            btn.style.left = `${randomX}px`;
+            btn.style.top = `${randomY}px`;
+        }
+
+        function acceptValentine() {
+            document.querySelector('.valentine-section').classList.remove('active');
+            document.querySelector('.success-section').classList.add('active');
+        }
+
+        // Background music setup
+        window.addEventListener('load', function() {
+            const audio = new Audio('IS.mp3');  // Add your audio file here
+            audio.loop = true;
+            audio.play().catch(e => console.log('Audio autoplay was prevented'));
+        }, { once: true });
+    </script>
+</body>
+</html>
